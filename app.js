@@ -5,6 +5,7 @@ const pendingIds = new Set();       // task ids with a PATCH/DELETE still in fli
 let currentFilter = 'all';          // 'all' | 'active' | 'done'
 let status = 'loading';             // 'loading' | 'error' | 'ready'
 let errorMessage = '';
+let isSubmitting = false;           // a POST is in flight
 
 // ── Helpers ──────────────────────────────────────────────────
 function getTodayString() {
@@ -47,8 +48,16 @@ async function api(path, options = {}) {
 }
 
 // ── Render ───────────────────────────────────────────────────
+// The add button is only usable once data has loaded and no POST is running
+function updateAddButton() {
+  const addBtn = document.getElementById('add-btn');
+  addBtn.disabled = status !== 'ready' || isSubmitting;
+  addBtn.textContent = isSubmitting ? 'Menyimpan…' : 'Tambah';
+}
+
 function render() {
   const list = document.getElementById('task-list');
+  updateAddButton();
   const activeCount = tasks.filter(t => !t.selesai).length;
 
   document.getElementById('active-count').textContent =
@@ -100,6 +109,7 @@ function renderCourses() {
 // ── Load tasks + courses ─────────────────────────────────────
 async function loadTasks() {
   status = 'loading';
+  showListError('');                // clear a stale message from an earlier failed action
   render();
 
   try {
@@ -113,6 +123,8 @@ async function loadTasks() {
   } catch (err) {
     errorMessage = describeError(err);
     status = 'error';
+    document.getElementById('course-select').innerHTML =
+      '<option value="">Mata kuliah tidak tersedia</option>';
   } finally {
     render();
   }
@@ -127,13 +139,13 @@ function showFormError(message) {
 
 async function addTask(e) {
   e.preventDefault();
+  if (isSubmitting || status !== 'ready') return;
 
   const titleInput = document.getElementById('task-input');
-  const addBtn = document.getElementById('add-btn');
 
   showFormError('');
-  addBtn.disabled = true;           // stop double submits while the request is in flight
-  addBtn.textContent = 'Menyimpan…';
+  isSubmitting = true;              // stop double submits while the request is in flight
+  updateAddButton();
 
   try {
     const created = await api('/api/tugas', {
@@ -152,8 +164,8 @@ async function addTask(e) {
   } catch (err) {
     showFormError(describeError(err));   // e.g. the server's 400 message
   } finally {
-    addBtn.disabled = false;
-    addBtn.textContent = 'Tambah';
+    isSubmitting = false;
+    updateAddButton();
   }
 }
 
