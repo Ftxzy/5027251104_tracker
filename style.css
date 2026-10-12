@@ -17,7 +17,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 28px;
+  margin-bottom: 20px;
 }
 
 .header h1 {
@@ -30,6 +30,26 @@ body {
   font-size: 13px;
   color: #6b8a9e;
   margin-top: 4px;
+}
+
+.header .tag {
+  font-size: 12px;
+  font-weight: 400;
+  color: #6b8a9e;
+  margin-left: 6px;
+}
+
+/* Toolbar: filters + counter */
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.counter {
+  font-size: 13px;
+  color: #6b8a9e;
 }
 
 /* Filter pills */
@@ -155,12 +175,23 @@ body {
 }
 
 /* Task text */
-.task-text {
+.task-body {
   flex: 1;
-  font-size: 15px;
-  color: #1a2e3b;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
   cursor: pointer;
   user-select: none;
+}
+
+.task-text {
+  font-size: 15px;
+  color: #1a2e3b;
+}
+
+.task-meta {
+  font-size: 12px;
+  color: #6b8a9e;
 }
 
 .task-text.done {
@@ -170,11 +201,11 @@ body {
 
 /* Delete button */
 .delete-btn {
-  padding: 6px 16px;
+  padding: 6px 12px;
   border-radius: 8px;
-  border: none;
-  background: #f0f6fa;
-  color: #6b8a9e;
+  border: 1px solid #f3c2c2;
+  background: #fff5f5;
+  color: #c0392b;
   font-family: inherit;
   font-size: 13px;
   cursor: pointer;
@@ -183,14 +214,29 @@ body {
 
 .delete-btn:hover {
   background: #fde8e8;
-  color: #c0392b;
 }
 
-/* Empty state */
-.empty {
+/* Loading / error / empty states */
+.state {
   text-align: center;
   color: #9ab5c4;
   font-size: 14px;
   padding: 40px 0;
   list-style: none;
 }
+
+.state-error { color: #c0392b; }
+
+.retry-btn {
+  margin-top: 12px;
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: 1.5px solid #c0392b;
+  background: white;
+  color: #c0392b;
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.retry-btn:hover { background: #fde8e8; }
