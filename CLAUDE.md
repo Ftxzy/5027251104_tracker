@@ -15,16 +15,18 @@ Plain HTML/CSS/vanilla JS only. No framework, no build step, no npm dependencies
   Error-handling pass done: the add button is locked until data is loaded (and while a POST runs),
   the course select shows a fallback on failure, and stale errors are cleared on retry.
   Next: the bonus items (debounced search, optimistic update), if wanted.
-- The Mock API is loaded from a CDN script (see "Mock API spec" below), not stored in this folder.
+- The Mock API is a local copy, `mock-api-kampus.js`, committed in this repo (the brief wants it in
+  the Git repo). It is an unmodified download of the lecturer's script (see "Mock API spec" below).
   Source slides: https://fuaddary.github.io/Pemrograman-Web/minggu6-async-fetch.html
   Do not invent behavior beyond the spec below.
 
 ## Mock API spec
-Script: `https://fuaddary.github.io/Pemrograman-Web/assets/mock-api-kampus.js`. It replaces
+Script: `mock-api-kampus.js` (copied unmodified from
+`https://fuaddary.github.io/Pemrograman-Web/assets/mock-api-kampus.js`; do not edit it). It replaces
 `window.fetch` and answers any URL starting with `/api/` (no real server, no CORS). Load it
 **before** `app.js`:
 ```html
-<script src="https://fuaddary.github.io/Pemrograman-Web/assets/mock-api-kampus.js"></script>
+<script src="mock-api-kampus.js"></script>
 <script src="app.js" defer></script>
 ```
 Use relative URLs such as `fetch("/api/tugas")`. Latency is simulated at 250-700 ms.
