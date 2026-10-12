@@ -17,6 +17,18 @@
       </div>
     </div>
 
+    <form class="add-form" id="add-form" novalidate>
+      <input type="text" id="task-input" placeholder="Judul tugas (min. 3 karakter)" autocomplete="off" />
+      <div class="add-row">
+        <select id="course-select" aria-label="Mata kuliah">
+          <option value="">Memuat mata kuliah…</option>
+        </select>
+        <input type="date" id="deadline-input" aria-label="Deadline" />
+        <button type="submit" class="add-btn" id="add-btn">Tambah</button>
+      </div>
+      <p class="form-error" id="form-error" hidden></p>
+    </form>
+
     <div class="toolbar">
       <div class="filters">
         <button class="filter-btn active" data-filter="all">Semua</button>

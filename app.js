@@ -1,5 +1,6 @@
 // ── State ────────────────────────────────────────────────────
 let tasks = [];
+let courses = [];
 let currentFilter = 'all';          // 'all' | 'active' | 'done'
 let status = 'loading';             // 'loading' | 'error' | 'ready'
 let errorMessage = '';
@@ -16,6 +17,13 @@ function escapeHtml(str) {
   return String(str).replace(/[&<>"']/g, ch => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
   }[ch]));
+}
+
+// Offline mode rejects with TypeError("Failed to fetch"); HTTP errors carry the server's message
+function describeError(err) {
+  return err instanceof TypeError
+    ? 'Tidak dapat terhubung ke server. Periksa koneksi kamu.'
+    : err.message;
 }
 
 // ── API ──────────────────────────────────────────────────────
@@ -81,26 +89,76 @@ function render() {
   `).join('');
 }
 
-// ── Load tasks ───────────────────────────────────────────────
+function renderCourses() {
+  const select = document.getElementById('course-select');
+  select.innerHTML = courses.map(c =>
+    `<option value="${escapeHtml(c.nama)}">${escapeHtml(c.nama)}</option>`
+  ).join('');
+}
+
+// ── Load tasks + courses ─────────────────────────────────────
 async function loadTasks() {
   status = 'loading';
   render();
 
   try {
-    tasks = await api('/api/tugas');
+    // The two requests don't depend on each other, so run them in parallel
+    [tasks, courses] = await Promise.all([
+      api('/api/tugas'),
+      api('/api/matkul'),
+    ]);
+    renderCourses();
     status = 'ready';
   } catch (err) {
-    // Offline mode rejects with TypeError("Failed to fetch"); HTTP errors carry the server's message
-    errorMessage = err instanceof TypeError
-      ? 'Tidak dapat terhubung ke server. Periksa koneksi kamu.'
-      : err.message;
+    errorMessage = describeError(err);
     status = 'error';
   } finally {
     render();
   }
 }
 
+// ── Add task ─────────────────────────────────────────────────
+function showFormError(message) {
+  const el = document.getElementById('form-error');
+  el.textContent = message;
+  el.hidden = !message;
+}
+
+async function addTask(e) {
+  e.preventDefault();
+
+  const titleInput = document.getElementById('task-input');
+  const addBtn = document.getElementById('add-btn');
+
+  showFormError('');
+  addBtn.disabled = true;           // stop double submits while the request is in flight
+  addBtn.textContent = 'Menyimpan…';
+
+  try {
+    const created = await api('/api/tugas', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        judul: titleInput.value,
+        matkul: document.getElementById('course-select').value,
+        deadline: document.getElementById('deadline-input').value,
+      }),
+    });
+
+    tasks.push(created);            // the server's response has the real id
+    titleInput.value = '';
+    render();
+  } catch (err) {
+    showFormError(describeError(err));   // e.g. the server's 400 message
+  } finally {
+    addBtn.disabled = false;
+    addBtn.textContent = 'Tambah';
+  }
+}
+
 // ── Event listeners ──────────────────────────────────────────
+document.getElementById('add-form').addEventListener('submit', addTask);
+
 document.getElementById('task-list').addEventListener('click', (e) => {
   if (e.target.closest('[data-action="retry"]')) loadTasks();
 });

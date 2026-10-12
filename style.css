@@ -79,15 +79,21 @@ body {
   color: #1a2e3b;
 }
 
-/* Add task row */
-.add-row {
+/* Add task form */
+.add-form {
   display: flex;
+  flex-direction: column;
   gap: 10px;
   margin-bottom: 20px;
 }
 
-.add-row input {
-  flex: 1;
+.add-row {
+  display: flex;
+  gap: 10px;
+}
+
+.add-form input,
+.add-form select {
   padding: 14px 18px;
   border-radius: 10px;
   border: none;
@@ -99,10 +105,22 @@ body {
   box-shadow: 0 1px 3px rgba(0,0,0,0.06);
 }
 
-.add-row input::placeholder { color: #aac3d0; }
+.add-row > input,
+.add-row > select {
+  flex: 1;
+  min-width: 0;
+}
 
-.add-row input:focus {
+.add-form input::placeholder { color: #aac3d0; }
+
+.add-form input:focus,
+.add-form select:focus {
   box-shadow: 0 0 0 2px #90c0d8;
+}
+
+.form-error {
+  font-size: 13px;
+  color: #c0392b;
 }
 
 .add-btn {
@@ -123,6 +141,11 @@ body {
 }
 
 .add-btn:hover { background: #2e7aa0; }
+
+.add-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
 
 /* Task list */
 .task-list {

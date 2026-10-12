@@ -8,9 +8,10 @@ files here), which now gets its data from a server instead of an in-memory array
 Plain HTML/CSS/vanilla JS only. No framework, no build step, no npm dependencies.
 
 ## Current state
-- `index.html`, `style.css`, `script.js`: the Week 5 tracker (in-memory `tasks` array, All/Completed
-  filter, add/toggle/delete, event delegation on `#task-list`).
-- Not a git repo yet.
+- `index.html`, `style.css`, `app.js` (renamed from `script.js`). Git repo on `main`, author
+  Khalifa Suryadinarta. Commits are made as each stage works.
+- Done: baseline, GET with loading/error/empty states, POST form (course `<select>` loaded with
+  `Promise.all`). Toggle/delete handlers are **not wired yet** (next: PATCH/DELETE commit).
 - The Mock API is loaded from a CDN script (see "Mock API spec" below), not stored in this folder.
   Source slides: https://fuaddary.github.io/Pemrograman-Web/minggu6-async-fetch.html
   Do not invent behavior beyond the spec below.
@@ -58,8 +59,7 @@ Use relative URLs such as `fetch("/api/tugas")`. Latency is simulated at 250-700
 `__API.setLatency(ms)`, `__API.simpan(true)`, `__API.calls` (request log), `__API.db`.
 
 ## Deliverables (per the brief)
-- `index.html`, `style.css`, **`app.js`** (the brief says `app.js`; the existing file is `script.js`,
-  so rename it and update the `<script>` tag).
+- `index.html`, `style.css`, **`app.js`** (renamed from `script.js`, done).
 - Mock API + the project in a Git repo with **at least 5 staged commits**, in this order:
   1. GET, render state
   2. POST
