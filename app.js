@@ -1,6 +1,7 @@
 // ── State ────────────────────────────────────────────────────
 let tasks = [];
 let courses = [];
+const pendingIds = new Set();       // task ids with a PATCH/DELETE still in flight
 let currentFilter = 'all';          // 'all' | 'active' | 'done'
 let status = 'loading';             // 'loading' | 'error' | 'ready'
 let errorMessage = '';
@@ -78,7 +79,7 @@ function render() {
   }
 
   list.innerHTML = filtered.map(task => `
-    <li class="task-card" data-id="${task.id}">
+    <li class="task-card ${pendingIds.has(task.id) ? 'pending' : ''}" data-id="${task.id}">
       <div class="task-check ${task.selesai ? 'checked' : ''}" data-action="toggle"></div>
       <div class="task-body" data-action="toggle">
         <span class="task-text ${task.selesai ? 'done' : ''}">${escapeHtml(task.judul)}</span>
@@ -156,11 +157,70 @@ async function addTask(e) {
   }
 }
 
+// ── Toggle / delete ──────────────────────────────────────────
+function showListError(message) {
+  const el = document.getElementById('list-error');
+  el.textContent = message;
+  el.hidden = !message;
+}
+
+async function toggleTask(id) {
+  const task = tasks.find(t => t.id === id);
+  if (!task || pendingIds.has(id)) return;
+
+  pendingIds.add(id);
+  showListError('');
+  render();
+
+  try {
+    const updated = await api(`/api/tugas/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ selesai: !task.selesai }),
+    });
+    tasks = tasks.map(t => t.id === id ? updated : t);   // trust the server's version
+  } catch (err) {
+    showListError(describeError(err));
+  } finally {
+    pendingIds.delete(id);
+    render();
+  }
+}
+
+async function deleteTask(id) {
+  if (pendingIds.has(id)) return;
+
+  pendingIds.add(id);
+  showListError('');
+  render();
+
+  try {
+    await api(`/api/tugas/${id}`, { method: 'DELETE' });  // 204: api() returns null, no JSON to parse
+    tasks = tasks.filter(t => t.id !== id);
+  } catch (err) {
+    showListError(describeError(err));
+  } finally {
+    pendingIds.delete(id);
+    render();
+  }
+}
+
 // ── Event listeners ──────────────────────────────────────────
 document.getElementById('add-form').addEventListener('submit', addTask);
 
+// One listener for the whole list (event delegation); data-action says what was clicked
 document.getElementById('task-list').addEventListener('click', (e) => {
-  if (e.target.closest('[data-action="retry"]')) loadTasks();
+  const target = e.target.closest('[data-action]');
+  if (!target) return;
+
+  if (target.dataset.action === 'retry') return loadTasks();
+
+  const card = target.closest('[data-id]');
+  if (!card) return;
+  const id = Number(card.dataset.id);
+
+  if (target.dataset.action === 'toggle') toggleTask(id);
+  if (target.dataset.action === 'delete') deleteTask(id);
 });
 
 document.querySelectorAll('.filter-btn').forEach(btn => {

@@ -11,7 +11,8 @@ Plain HTML/CSS/vanilla JS only. No framework, no build step, no npm dependencies
 - `index.html`, `style.css`, `app.js` (renamed from `script.js`). Git repo on `main`, author
   Khalifa Suryadinarta. Commits are made as each stage works.
 - Done: baseline, GET with loading/error/empty states, POST form (course `<select>` loaded with
-  `Promise.all`). Toggle/delete handlers are **not wired yet** (next: PATCH/DELETE commit).
+  `Promise.all`), PATCH toggle and DELETE via event delegation (`pendingIds` blocks double clicks).
+  Next: error-handling polish commit, then the bonus items.
 - The Mock API is loaded from a CDN script (see "Mock API spec" below), not stored in this folder.
   Source slides: https://fuaddary.github.io/Pemrograman-Web/minggu6-async-fetch.html
   Do not invent behavior beyond the spec below.

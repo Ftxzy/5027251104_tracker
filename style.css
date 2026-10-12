@@ -263,3 +263,11 @@ body {
 }
 
 .retry-btn:hover { background: #fde8e8; }
+
+/* Row action in flight (PATCH/DELETE) */
+.task-card.pending {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.list-error { margin-bottom: 12px; }
